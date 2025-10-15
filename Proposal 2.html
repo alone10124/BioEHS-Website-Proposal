@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Berkeley Bioengineering Course Map</title>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <style>
+        :root {
+  /* Primitive Color Tokens */
+  --color-white: rgba(255, 255, 255, 1);
+  --color-black: rgba(0, 0, 0, 1);
+  --color-cream-50: rgba(252, 252, 249, 1);
+  --color-cream-100: rgba(255, 255, 253, 1);
+  --color-gray-200: rgba(245, 245, 245, 1);
+  --color-gray-300: rgba(167, 169, 169, 1);
+  --color-gray-400: rgba(119, 124, 124, 1);
+  --color-slate-500: rgba(98, 108, 113, 1);
+  --color-brown-600: rgba(94, 82, 64, 1);
+  --color-charcoal-700: rgba(31, 33, 33, 1);
+  --color-charcoal-800: rgba(38, 40, 40, 1);
+  --color-slate-900: rgba(19, 52, 59, 1);
+  --color-teal-300: rgba(50, 184, 198, 1);
+  --color-teal-400: rgba(45, 166, 178, 1);
+  --color-teal-500: rgba(33, 128, 141, 1);
+  --color-teal-600: rgba(29, 116, 128, 1);
+  --color-teal-700: rgba(26, 104, 115, 1);
+  --color-teal-800: rgba(41, 150, 161, 1);
+  --color-red-400: rgba(255, 84, 89, 1);
+  --color-red-500: rgba(192, 21, 47, 1);
+  --color-orange-400: rgba(230, 129, 97, 1);
+  --color-orange-500: rgba(168, 75, 47, 1);
+
+  /* RGB versions for opacity control */
+  --color-brown-600-rgb: 94, 82, 64;
+  --color-teal-500-rgb: 33, 128, 141;
+  --color-slate-900-rgb: 19, 52, 59;
+  --color-slate-500-rgb: 98, 108, 113;
+  --color-red-500-rgb: 192, 21, 47;
+  --color-red-400-rgb: 255, 84, 89;
+  --color-orange-500-rgb: 168, 75, 47;
+  --color-orange-400-rgb: 230, 129, 97;
+
+  /* Background color tokens (Light Mode) */
+  --color-bg-1: rgba(59, 130, 246, 0.08);
+  --color-bg-2: rgba(245, 158, 11, 0.08);
+  --color-bg-3: rgba(34, 197, 94, 0.08);
+  --color-bg-4: rgba(239, 68, 68, 0.08);
+  --color-bg-5: rgba(147, 51, 234, 0.08);
+  --color-bg-6: rgba(249, 115, 22, 0.08);
+  --color-bg-7: rgba(236, 72, 153, 0.08);
+  --color-bg-8: rgba(6, 182, 212, 0.08);
+
+  /* Semantic Color Tokens (Light Mode) */
+  --color-background: var(--color-cream-50);
+  --color-surface: var(--color-cream-100);
+  --color-text: var(--color-slate-900);
+  --color-text-secondary: var(--color-slate-500);
+  --color-primary: var(--color-teal-500);
+  --color-primary-hover: var(--color-teal-600);
+  --color-primary-active: var(--color-teal-700);
+  --color-secondary: rgba(var(--color-brown-600-rgb), 0.12);
+  --color-secondary-hover: rgba(var(--color-brown-600-rgb), 0.2);
+  --color-secondary-active: rgba(var(--color-brown-600-rgb), 0.25);
+  --color-border: rgba(var(--color-brown-600-rgb), 0.2);
+  --color-btn-primary-text: var(--color-cream-50);
+  --color-card-border: rgba(var(--color-brown-600-rgb), 0.12);
+  --color-card-border-inner: rgba(var(--color-brown-600-rgb), 0.12);
+  --color-error: var(--color-red-500);
+  --color-success: var(--color-teal-500);
+  --color-warning: var(--color-orange-500);
+  --color-info: var(--color-slate-500);
+  --color-focus-ring: rgba(var(--color-teal-500-rgb), 0.4);
+  --color-select-caret: rgba(var(--color-slate-900-rgb), 0.8);
+
+  /* Common style patterns */
+  --focus-ring: 0 0 0 3px var(--color-focus-ring);
+  --focus-outline: 2px solid var(--color-primary);
+  --status-bg-opacity: 0.15;
+  --status-border-opacity: 0.25;
+  --select-caret-light: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23134252' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  --select-caret-dark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23f5f5f5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+
+  /* RGB versions for opacity control */
+  --color-success-rgb: 33, 128, 141;
+  --color-error-rgb: 192, 21, 47;
+  --color-warning-rgb: 168, 75, 47;
+  --color-info-rgb: 98, 108, 113;
+
+  /* Typography */
+  --font-family-base: "FKGroteskNeue", "Geist", "Inter", -apple-system,
+    BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-family-mono: "Berkeley Mono", ui-monospace, SFMono-Regular, Menlo,
+    Monaco, Consolas, monospace;
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-md: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 18px;
+  --font-size-2xl: 20px;
+  --font-size-3xl: 24px;
+  --font-size-4xl: 30px;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 550;
+  --font-weight-bold: 600;
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --letter-spacing-tight: -0.01em;
+
+  /* Spacing */
+  --space-0: 0;
+  --space-1: 1px;
+  --space-2: 2px;
+  --space-4: 4px;
+  --space-6: 6px;
+  --space-8: 8px;
+  --space-10: 10px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-20: 20px;
+  --space-24: 24px;
+  --space-32: 32px;
+
+  /* Border Radius */
+  --radius-sm: 6px;
+  --radius-base: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.02);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.04),
+    0 2px 4px -1px rgba(0, 0, 0, 0.02);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.04),
+    0 4px 6px -2px rgba(0, 0, 0, 0.02);
+  --shadow-inset-sm: inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.03);
+
+  /* Animation */
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --ease-standard: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Layout */
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1280px;
+}
+
+/* Dark mode colors */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-gray-400-rgb: 119, 124, 124;
+    --color-teal-300-rgb: 50, 184, 198;
+    --color-gray-300-rgb: 167, 169, 169;
+    --color-gray-200-rgb: 245, 245, 245;
+
+    --color-bg-1: rgba(29, 78, 216, 0.15);
+    --color-bg-2: rgba(180, 83, 9, 0.15);
+    --color-bg-3: rgba(21, 128, 61, 0.15);
+    --color-bg-4: rgba(185, 28, 28, 0.15);
+    --color-bg-5: rgba(107, 33, 168, 0.15);
+    --color-bg-6: rgba(194, 65, 12, 0.15);
+    --color-bg-7: rgba(190, 24, 93, 0.15);
+    --color-bg-8: rgba(8, 145, 178, 0.15);
+
+    --color-background: var(--color-charcoal-700);
+    --color-surface: var(--color-charcoal-800);
+    --color-text: var(--color-gray-200);
+    --color-text-secondary: rgba(var(--color-gray-300-rgb), 0.7);
+    --color-primary: var(--color-teal-300);
+    --color-primary-hover: var(--color-teal-400);
+    --color-primary-active: var(--color-teal-800);
+    --color-secondary: rgba(var(--color-gray-400-rgb), 0.15);
+    --color-secondary-hover: rgba(var(--color-gray-400-rgb), 0.25);
+    --color-secondary-active: rgba(var(--color-gray-400-rgb), 0.3);
+    --color-border: rgba(var(--color-gray-400-rgb), 0.3);
+    --color-error: var(--color-red-400);
+    --color-success: var(--color-teal-300);
+    --color-warning: var(--color-orange-400);
+    --color-info: var(--color-gray-300);
+    --color-focus-ring: rgba(var(--color-teal-300-rgb), 0.4);
+    --color-btn-primary-text: var(--color-slate-900);
+    --color-card-border: rgba(var(--color-gray-400-rgb), 0.2);
+    --color-card-border-inner: rgba(var(--color-gray-400-rgb), 0.15);
+    --shadow-inset-sm: inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+    --color-select-caret: rgba(var(--color-gray-200-rgb), 0.8);
+
+    --color-success-rgb: var(--color-teal-300-rgb);
+    --color-error-rgb: var(--color-red-400-rgb);
+    --color-warning-rgb: var(--color-orange-400-rgb);
+    --color-info-rgb: var(--color-gray-300-rgb);
+  }
+}
+
+/* Base styles */
+html {
+  font-size: var(--font-size-base);
+  font-family: var(--font-family-base);
+  line-height: var(--line-height-normal);
+  color: var(--color-text);
+  background-color: var(--color-background);
+  -webkit-font-smoothing: antialiased;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+h1 { font-size: var(--font-size-4xl); }
+h2 { font-size: var(--font-size-3xl); }
+h3 { font-size: var(--font-size-2xl); }
+h4 { font-size: var(--font-size-xl); }
+h5 { font-size: var(--font-size-lg); }
+h6 { font-size: var(--font-size-md); }
+
+p {
+  margin: 0 0 var(--space-16) 0;
+}
+
+/* Custom styles for course map */
+.app-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-16);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-16);
+}
+
+.header h1 {
+  margin: 0;
+  font-size: var(--font-size-2xl);
+}
+
+.controls {
+  display: flex;
+  gap: var(--space-16);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-input {
+  padding: var(--space-8) var(--space-12);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-base);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  min-width: 200px;
+}
+
+.concentration-filter {
+  padding: var(--space-8) var(--space-12);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-base);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.course-map {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 300px;
+  background: var(--color-surface);
+  border-left: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+}
+
+.legend {
+  padding: var(--space-16);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.legend h3 {
+  margin-bottom: var(--space-12);
+  font-size: var(--font-size-lg);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  margin-bottom: var(--space-8);
+}
+
+.legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+}
+
+.legend-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.course-info {
+  flex: 1;
+  padding: var(--space-16);
+  overflow-y: auto;
+}
+
+.course-info h3 {
+  margin-bottom: var(--space-12);
+}
+
+.course-info .course-code {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  font-size: var(--font-size-xl);
+  margin-bottom: var(--space-8);
+}
+
+.course-info .course-name {
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--space-16);
+}
+
+.course-detail {
+  margin-bottom: var(--space-12);
+}
+
+.course-detail-label {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--space-4);
+}
+
+.course-detail-value {
+  font-size: var(--font-size-sm);
+}
+
+.prerequisites-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.prerequisites-list li {
+  background: var(--color-secondary);
+  padding: var(--space-4) var(--space-8);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-4);
+  font-size: var(--font-size-xs);
+}
+
+.concentrations-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.concentration-tag {
+  padding: var(--space-4) var(--space-8);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: white;
+}
+
+/* SVG styles */
+.course-node {
+  cursor: pointer;
+  opacity: 1.0 !important;
+  transition: none;
+}
+
+.course-node:hover {
+  /* Removed transform to prevent shaking */
+}
+
+.course-node:hover rect {
+  stroke-width: 3px;
+  filter: brightness(1.1);
+}
+
+.course-node rect {
+  opacity: 1.0 !important;
+}
+
+.course-node text {
+  opacity: 1.0 !important;
+  fill: white !important;
+}
+
+.course-node.highlighted {
+  stroke: var(--color-primary);
+  stroke-width: 3px;
+}
+
+.course-node.faded {
+  opacity: 0.3;
+}
+
+.course-text {
+  font-size: 11px;
+  font-weight: var(--font-weight-medium);
+  text-anchor: middle;
+  dominant-baseline: middle;
+  pointer-events: none;
+  fill: white !important;
+  opacity: 1.0 !important;
+}
+
+.prerequisite-link {
+  stroke: var(--color-border);
+  stroke-width: 1.5;
+  fill: none;
+  marker-end: url(#arrowhead);
+}
+
+.prerequisite-link.highlighted {
+  stroke: var(--color-primary);
+  stroke-width: 2.5;
+}
+
+.prerequisite-link.faded {
+  opacity: 0.2;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    max-height: 40vh;
+  }
+  
+  .main-content {
+    flex-direction: column;
+  }
+  
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .search-input {
+    min-width: unset;
+  }
+}
+
+@font-face {
+  font-family: 'FKGroteskNeue';
+  src: url('https://r2cdn.perplexity.ai/fonts/FKGroteskNeue.woff2')
+    format('woff2');
+}
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <h1>Berkeley Bioengineering Course Map</h1>
+            <div class="controls">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search courses...">
+                <select id="concentrationFilter" class="concentration-filter">
+                    <option value="all">All Concentrations</option>
+                    <option value="prerequisite">Prerequisites</option>
+                    <option value="core">Core BioE</option>
+                    <option value="devices">Biomedical Devices</option>
+                    <option value="imaging">Biomedical Imaging</option>
+                    <option value="celltissue">Cell &amp; Tissue Engineering</option>
+                    <option value="computational">Computational Biology</option>
+                    <option value="synthetic">Synthetic Biology</option>
+                    <option value="research">Research</option>
+                    <option value="capstone">Capstone</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="course-map">
+                <svg id="coursemap" width="100%" height="100%">
+                    <defs>
+                        <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+                         refX="9" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#626262" />
+                        </marker>
+                        <marker id="arrowhead-highlight" markerWidth="10" markerHeight="7" 
+                         refX="9" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#21808d" />
+                        </marker>
+                    </defs>
+                </svg>
+            </div>
+            
+            <div class="sidebar">
+                <div class="legend">
+                    <h3>Legend</h3>
+                    <div id="legendItems"></div>
+                </div>
+                
+                <div class="course-info">
+                    <div id="courseDetails">
+                        <p style="color: var(--color-text-secondary); text-align: center; margin-top: 2rem;">Click on a course to see details</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Course data
+        const courses = {
+            // Prerequisites
+            "Math 1A": { name: "Calculus", level: "lower", prerequisites: [], concentration: "prerequisite" },
+            "Math 1B": { name: "Calculus II", level: "lower", prerequisites: ["Math 1A"], concentration: "prerequisite" },
+            "Math 53": { name: "Multivariable Calculus", level: "lower", prerequisites: ["Math 1B"], concentration: "prerequisite" },
+            "Math 54": { name: "Linear Algebra and Differential Equations", level: "lower", prerequisites: ["Math 53"], concentration: "prerequisite" },
+            "Physics 7A": { name: "Physics for Scientists and Engineers", level: "lower", prerequisites: ["Math 1A"], concentration: "prerequisite" },
+            "Physics 7B": { name: "Physics for Scientists and Engineers", level: "lower", prerequisites: ["Physics 7A", "Math 1B"], concentration: "prerequisite" },
+            "Chem 1A": { name: "General Chemistry", level: "lower", prerequisites: [], concentration: "prerequisite" },
+            "Chem 1AL": { name: "General Chemistry Lab", level: "lower", prerequisites: ["Chem 1A"], concentration: "prerequisite" },
+            "Chem 3A": { name: "Chemical Structure and Reactivity", level: "lower", prerequisites: ["Chem 1A"], concentration: "prerequisite" },
+            "Chem 3AL": { name: "Chemical Structure and Reactivity Lab", level: "lower", prerequisites: ["Chem 3A"], concentration: "prerequisite" },
+            "E7": { name: "Introduction to Computer Programming", level: "lower", prerequisites: [], concentration: "prerequisite" },
+            "CS 61A": { name: "Structure and Interpretation of Computer Programs", level: "lower", prerequisites: [], concentration: "prerequisite" },
+            "EECS 16A": { name: "Foundations of Signals, Dynamical Systems", level: "lower", prerequisites: ["Math 54"], concentration: "prerequisite" },
+            "EECS 16B": { name: "Introduction to Circuits &amp; Devices", level: "lower", prerequisites: ["EECS 16A"], concentration: "prerequisite" },
+            "CS 61B": { name: "Data Structures", level: "lower", prerequisites: ["CS 61A"], concentration: "prerequisite" },
+            "CS 70": { name: "Discrete Mathematics and Probability Theory", level: "lower", prerequisites: ["CS 61A"], concentration: "prerequisite" },
+
+            // Core BioE courses
+            "BioE 10": { name: "Introduction to Biomedicine for Engineers", level: "lower", prerequisites: [], concentration: "core" },
+            "BioE 11": { name: "Engineering Molecules", level: "lower", prerequisites: ["Chem 3A"], concentration: "core" },
+            "BioE 25": { name: "Careers in Biotechnology", level: "lower", prerequisites: [], concentration: "core" },
+            "BioE 26": { name: "Introduction to Bioengineering", level: "lower", prerequisites: [], concentration: "core" },
+            "BioE 100": { name: "Ethics in Science and Engineering", level: "upper", prerequisites: [], concentration: "core" },
+
+            // BioE Fundamentals
+            "BioE 101": { name: "Instrumentation in Biology and Medicine", level: "upper", prerequisites: ["EECS 16A", "EECS 16B", "BioE 105"], concentration: "devices,imaging" },
+            "BioE 102": { name: "Biomechanics", level: "upper", prerequisites: ["Math 54", "Physics 7B"], concentration: "devices,celltissue" },
+            "BioE 103": { name: "Engineering Molecules 2", level: "upper", prerequisites: ["BioE 11", "Chem 3A"], concentration: "celltissue,synthetic" },
+            "BioE 104": { name: "Biological Transport Phenomena", level: "upper", prerequisites: ["Math 54", "BioE 11"], concentration: "devices,celltissue" },
+            "BioE 105": { name: "Engineering Devices 1", level: "upper", prerequisites: ["EECS 16A", "EECS 16B"], concentration: "devices,imaging" },
+            "BioE 110": { name: "Biomedical Physiology for Engineers", level: "upper", prerequisites: ["BioE 11"], concentration: "celltissue,devices" },
+            "BioE C131": { name: "Intro to Computational Molecular and Cell Biology", level: "upper", prerequisites: ["CS 61A"], concentration: "computational,synthetic" },
+
+            // Additional upper division courses
+            "BioE 111": { name: "Bioengineering and Biotechnology", level: "upper", prerequisites: ["BioE 11"], concentration: "devices" },
+            "BioE 114": { name: "Cell Engineering", level: "upper", prerequisites: ["BioE 11"], concentration: "celltissue,synthetic" },
+            "BioE 115": { name: "Microbial Engineering", level: "upper", prerequisites: ["BioE 11"], concentration: "synthetic" },
+            "BioE C117": { name: "Physical Biology", level: "upper", prerequisites: ["BioE 11"], concentration: "devices" },
+            "BioE C118": { name: "Biosensors and Bioelectronics", level: "upper", prerequisites: ["BioE 105"], concentration: "devices" },
+            "BioE C119": { name: "Microfluidics and Lab-on-Chip", level: "upper", prerequisites: ["BioE 11"], concentration: "devices" },
+            "BioE 121": { name: "Physiological Control Systems", level: "upper", prerequisites: ["BioE 105"], concentration: "devices" },
+            "BioE 121L": { name: "Physiological Control Systems Lab", level: "upper", prerequisites: ["BioE 121"], concentration: "devices" },
+            "BioE 124": { name: "Transport in Tissue Engineering", level: "upper", prerequisites: ["BioE 11"], concentration: "celltissue" },
+            "BioE 134": { name: "Genetic Engineering", level: "upper", prerequisites: ["CS 61A"], concentration: "synthetic,computational" },
+            "BioE 135": { name: "Biological Network Analysis", level: "upper", prerequisites: ["BioE C131"], concentration: "synthetic,computational" },
+            "BioE C137": { name: "Regenerative Medicine", level: "upper", prerequisites: ["BioE 11"], concentration: "celltissue" },
+            "BioE 140L": { name: "Bioengineering Laboratory", level: "upper", prerequisites: ["BioE 11"], concentration: "celltissue" },
+            "BioE C142": { name: "Immunoengineering", level: "upper", prerequisites: ["BioE 11"], concentration: "celltissue" },
+            "BioE 145": { name: "Biotechnology and Global Health", level: "upper", prerequisites: ["BioE 105"], concentration: "devices" },
+            "BioE C146": { name: "Molecular and Cell Biology for Engineers", level: "upper", prerequisites: ["BioE 11"], concentration: "celltissue" },
+            "BioE 147": { name: "Computational Genomics", level: "upper", prerequisites: ["CS 61B"], concentration: "synthetic,computational" },
+            "BioE 148": { name: "Bioinformatics Algorithms", level: "upper", prerequisites: ["BioE 147"], concentration: "synthetic,computational" },
+            "BioE C149": { name: "Developmental Bioengineering", level: "upper", prerequisites: ["BioE 11"], concentration: "celltissue" },
+            "BioE 150": { name: "Finite Element Analysis", level: "upper", prerequisites: ["BioE 105"], concentration: "devices" },
+            "BioE 153": { name: "Biomaterials", level: "upper", prerequisites: ["BioE 11"], concentration: "celltissue" },
+            "BioE C157": { name: "Cell and Tissue Engineering", level: "upper", prerequisites: ["BioE 11"], concentration: "celltissue" },
+            "BioE 163": { name: "Medical Imaging Signals and Systems", level: "upper", prerequisites: ["BioE 105"], concentration: "devices,imaging" },
+            "BioE 163L": { name: "Medical Imaging Signals and Systems Lab", level: "upper", prerequisites: ["BioE 163"], concentration: "devices,imaging" },
+            "BioE C165": { name: "Biomedical Imaging", level: "upper", prerequisites: ["BioE 101"], concentration: "imaging" },
+            "BioE 166": { name: "Biomedical Optics and Microscopy", level: "upper", prerequisites: ["BioE 105"], concentration: "imaging" },
+            "BioE 168L": { name: "Biomedical Devices Laboratory", level: "upper", prerequisites: ["BioE 105"], concentration: "imaging" },
+            "BioE C171": { name: "Stem Cells and Tissue Engineering", level: "upper", prerequisites: ["BioE 11"], concentration: "celltissue" },
+            "BioE 190": { name: "Research", level: "upper", prerequisites: [], concentration: "research" },
+            "BioE 192": { name: "Senior Capstone Design", level: "upper", prerequisites: [], concentration: "capstone" },
+            "BioE 198": { name: "Directed Group Studies", level: "upper", prerequisites: [], concentration: "research" }
+        };
+
+        const concentrations = {
+            prerequisite: { color: "#A0A0A0", name: "Prerequisites" },
+            core: { color: "#3B82F6", name: "Core BioE" },
+            devices: { color: "#EF4444", name: "Biomedical Devices" },
+            imaging: { color: "#10B981", name: "Biomedical Imaging" },
+            celltissue: { color: "#8B5CF6", name: "Cell & Tissue Engineering" },
+            computational: { color: "#F97316", name: "Computational Biology" },
+            synthetic: { color: "#EAB308", name: "Synthetic Biology" },
+            research: { color: "#EC4899", name: "Research" },
+            capstone: { color: "#14B8A6", name: "Capstone" }
+        };
+
+        // Graph setup
+        const svg = d3.select("#coursemap");
+        const container = svg.append("g");
+        
+        let selectedCourse = null;
+        let filteredConcentration = "all";
+        let searchTerm = "";
+
+        // Create legend
+        function createLegend() {
+            const legendContainer = d3.select("#legendItems");
+            Object.entries(concentrations).forEach(([key, value]) => {
+                const item = legendContainer.append("div").attr("class", "legend-item");
+                item.append("div")
+                    .attr("class", "legend-color")
+                    .style("background-color", value.color);
+                item.append("span")
+                    .attr("class", "legend-label")
+                    .text(value.name);
+            });
+        }
+
+        // Get node color based on concentration(s) - CRITICAL: Ensure valid colors
+        function getNodeColor(course) {
+            if (!courses[course]) {
+                console.error(`Course ${course} not found`);
+                return '#808080'; // Fallback gray color
+            }
+            
+            const concentrationList = courses[course].concentration.split(',');
+            const primaryConc = concentrationList[0].trim();
+            
+            if (!concentrations[primaryConc]) {
+                console.error(`Concentration ${primaryConc} not found for course ${course}`);
+                return '#808080'; // Fallback gray color
+            }
+            
+            const color = concentrations[primaryConc].color;
+            console.log(`Color for ${course} (${primaryConc}): ${color}`);
+            return color;
+        }
+
+        // STABLE HIERARCHICAL LAYOUT - Fixed positions to prevent nodes from disappearing
+        function calculatePositions() {
+            const nodes = Object.keys(courses);
+            const positions = {};
+            
+            console.log(`Calculating positions for ${nodes.length} courses`); // Debug logging
+            
+            // Group courses by level and sort
+            const lowerDivision = nodes.filter(course => courses[course].level === "lower");
+            const upperDivision = nodes.filter(course => courses[course].level === "upper");
+            
+            console.log(`Lower division: ${lowerDivision.length}, Upper division: ${upperDivision.length}`);
+            
+            // Further group by concentration
+            const prereqs = lowerDivision.filter(course => courses[course].concentration === "prerequisite");
+            const coreLower = lowerDivision.filter(course => courses[course].concentration === "core");
+            const upperByConc = {};
+            
+            upperDivision.forEach(course => {
+                const concs = courses[course].concentration.split(',');
+                const primaryConc = concs[0]; // Use first concentration as primary
+                if (!upperByConc[primaryConc]) upperByConc[primaryConc] = [];
+                if (!upperByConc[primaryConc].includes(course)) {
+                    upperByConc[primaryConc].push(course);
+                }
+            });
+            
+            const minSpacing = 140; // Minimum spacing between nodes (increased for larger nodes)
+            let y = 80; // Start higher to ensure visibility
+            
+            // Position prerequisites at the top with guaranteed spacing
+            prereqs.forEach((course, i) => {
+                const x = 140 + (i % 6) * 200; // 6 per row with 200px spacing
+                const yPos = y + Math.floor(i / 6) * 110;
+                positions[course] = { x, y: yPos };
+                console.log(`Positioned ${course} at (${x}, ${yPos})`);
+            });
+            y += Math.ceil(prereqs.length / 6) * 110 + 100;
+            
+            // Position core courses
+            coreLower.forEach((course, i) => {
+                const x = 240 + (i % 4) * 200;
+                const yPos = y + Math.floor(i / 4) * 110;
+                positions[course] = { x, y: yPos };
+                console.log(`Positioned ${course} at (${x}, ${yPos})`);
+            });
+            y += Math.ceil(coreLower.length / 4) * 110 + 100;
+            
+            // Position upper division courses by concentration with fixed layout
+            const concentrationOrder = ['devices', 'imaging', 'celltissue', 'computational', 'synthetic', 'research', 'capstone'];
+            let currentRow = 0;
+            
+            concentrationOrder.forEach((conc, concIndex) => {
+                if (upperByConc[conc] && upperByConc[conc].length > 0) {
+                    const courseList = upperByConc[conc];
+                    const coursesPerRow = 5; // Fixed 5 per row
+                    
+                    courseList.forEach((course, i) => {
+                        if (!positions[course]) {
+                            const row = Math.floor(i / coursesPerRow);
+                            const col = i % coursesPerRow;
+                            
+                            const x = 140 + col * 200;
+                            const yPos = y + currentRow * 130 + row * 110;
+                            
+                            positions[course] = { x, y: yPos };
+                            console.log(`Positioned ${course} at (${x}, ${yPos})`);
+                        }
+                    });
+                    
+                    currentRow += Math.ceil(courseList.length / coursesPerRow);
+                }
+            });
+            
+            // Validate all positions are valid numbers
+            Object.entries(positions).forEach(([course, pos]) => {
+                if (isNaN(pos.x) || isNaN(pos.y)) {
+                    console.error(`Invalid position for ${course}:`, pos);
+                    // Fallback to a safe position
+                    positions[course] = { x: 100, y: 100 };
+                }
+            });
+            
+            console.log(`Final positions calculated for ${Object.keys(positions).length} courses`);
+            
+            // Final validation - ensure no invalid positions
+            let validCount = 0;
+            Object.entries(positions).forEach(([course, pos]) => {
+                if (!isNaN(pos.x) && !isNaN(pos.y) && pos.x >= 0 && pos.y >= 0) {
+                    validCount++;
+                } else {
+                    console.error(`Invalid position for ${course}:`, pos);
+                    // Fix invalid positions
+                    positions[course] = { x: 100 + (validCount % 10) * 150, y: 100 + Math.floor(validCount / 10) * 100 };
+                }
+            });
+            
+            console.log(`Valid positions: ${validCount}/${Object.keys(positions).length}`);
+            return positions;
+        }
+        
+        // REMOVED: Minimum spacing enforcement to prevent position corruption
+        // This function was causing nodes to move to invalid positions
+        // Instead, we use fixed hierarchical layout with guaranteed spacing
+
+        // Create links for prerequisites
+        function createLinks(positions) {
+            const links = [];
+            Object.entries(courses).forEach(([course, data]) => {
+                data.prerequisites.forEach(prereq => {
+                    if (positions[prereq] && positions[course]) {
+                        links.push({
+                            source: prereq,
+                            target: course,
+                            sx: positions[prereq].x,
+                            sy: positions[prereq].y,
+                            tx: positions[course].x,
+                            ty: positions[course].y
+                        });
+                    }
+                });
+            });
+            return links;
+        }
+
+        // Draw the course map - CRITICAL: Ensure proper rendering order and visibility
+        function drawCourseMap() {
+            console.log('Starting to draw course map...');
+            container.selectAll("*").remove();
+            
+            const positions = calculatePositions();
+            const links = createLinks(positions);
+            
+            console.log(`Positions calculated: ${Object.keys(positions).length} courses`);
+            console.log(`Links created: ${links.length} links`);
+            
+            // Filter courses based on search and concentration filter
+            const visibleCourses = Object.keys(courses).filter(course => {
+                const matchesSearch = searchTerm === "" || 
+                    course.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    courses[course].name.toLowerCase().includes(searchTerm.toLowerCase());
+                
+                const matchesConcentration = filteredConcentration === "all" ||
+                    courses[course].concentration.includes(filteredConcentration);
+                
+                return matchesSearch && matchesConcentration;
+            });
+            
+            console.log(`Visible courses: ${visibleCourses.length}`);
+            
+            // STEP 1: Draw links first (so they appear behind nodes)
+            const validLinks = links.filter(link => 
+                visibleCourses.includes(link.source) && visibleCourses.includes(link.target)
+            );
+            
+            console.log(`Drawing ${validLinks.length} links...`);
+            
+            const linkElements = container.selectAll(".prerequisite-link")
+                .data(validLinks)
+                .enter()
+                .append("path")
+                .attr("class", "prerequisite-link")
+                .attr("d", d => {
+                    const dx = d.tx - d.sx;
+                    const dy = d.ty - d.sy;
+                    const dr = Math.sqrt(dx * dx + dy * dy);
+                    return `M${d.sx},${d.sy}A${dr},${dr} 0 0,1 ${d.tx - 15},${d.ty - 15}`;
+                })
+                .attr("opacity", 1.0);
+            
+            // STEP 2: Draw nodes on top - CRITICAL: Ensure nodes are visible and properly positioned
+            console.log(`Drawing ${visibleCourses.length} nodes...`);
+            
+            const nodeElements = container.selectAll(".course-node")
+                .data(visibleCourses)
+                .enter()
+                .append("g")
+                .attr("class", "course-node")
+                .attr("transform", d => {
+                    const pos = positions[d];
+                    if (!pos || isNaN(pos.x) || isNaN(pos.y)) {
+                        console.error(`Invalid position for node ${d}:`, pos);
+                        return `translate(100, 100)`; // Fallback position
+                    }
+                    console.log(`Positioning node ${d} at (${pos.x}, ${pos.y})`);
+                    return `translate(${pos.x}, ${pos.y})`;
+                })
+                .attr("opacity", 1.0)  // CRITICAL: Ensure full opacity
+                .on("click", handleCourseClick)
+                .on("mouseover", handleCourseHover);
+            
+            // Add course rectangles with stable styling - CRITICAL: Ensure nodes are visible
+            nodeElements.append("rect")
+                .attr("width", 120)  // Increased from 100 to ensure visibility
+                .attr("height", 50)   // Increased from 40 to ensure visibility
+                .attr("rx", 8)
+                .attr("x", -60)       // Adjusted for new width
+                .attr("y", -25)       // Adjusted for new height
+                .attr("fill", d => {
+                    const color = getNodeColor(d);
+                    console.log(`Node ${d} color: ${color}`); // Debug logging
+                    return color;
+                })
+                .attr("stroke", "#333")
+                .attr("stroke-width", 2)  // Increased stroke width for visibility
+                .attr("opacity", 1.0)     // CRITICAL: Ensure full opacity
+                .style("transition", "stroke-width 150ms ease, filter 150ms ease");
+            
+            // Add course text - CRITICAL: Ensure text is visible with multiple text elements for better fit
+            // Course code (main text)
+            nodeElements.append("text")
+                .attr("class", "course-text")
+                .text(d => {
+                    // Shorten long course names to fit in the box
+                    if (d.length > 10) {
+                        return d.split(' ').map(part => part.substring(0, 4)).join(' ');
+                    }
+                    return d;
+                })
+                .attr("dy", 0)
+                .attr("fill", "white")     // CRITICAL: Ensure text color is visible
+                .attr("font-size", "10px") // Appropriate size for the box
+                .attr("font-weight", "600")
+                .attr("text-anchor", "middle")
+                .attr("dominant-baseline", "middle")
+                .attr("opacity", 1.0)      // CRITICAL: Ensure full opacity
+                .style("pointer-events", "none");
+            
+            // Set up zoom behavior with smooth transitions
+            const zoom = d3.zoom()
+                .scaleExtent([0.3, 2])
+                .on("zoom", (event) => {
+                    container.attr("transform", event.transform);
+                })
+                .filter((event) => {
+                    // Prevent zoom during node interactions
+                    return !event.target.closest('.course-node');
+                });
+            
+            svg.call(zoom);
+            
+            // CRITICAL: Ensure initial zoom shows nodes properly
+            console.log('Setting initial zoom...');
+            
+            // Wait for DOM to update before calculating bounds
+            setTimeout(() => {
+                try {
+                    const bounds = container.node().getBBox();
+                    const fullWidth = svg.node().getBoundingClientRect().width;
+                    const fullHeight = svg.node().getBoundingClientRect().height;
+                    
+                    console.log('Bounds:', bounds);
+                    console.log('SVG dimensions:', fullWidth, fullHeight);
+                    
+                    if (bounds.width > 0 && bounds.height > 0) {
+                        const scale = Math.min(
+                            (fullWidth - 100) / bounds.width, 
+                            (fullHeight - 100) / bounds.height, 
+                            0.7  // Reduced scale to ensure visibility
+                        );
+                        const translateX = (fullWidth - bounds.width * scale) / 2 - bounds.x * scale + 50;
+                        const translateY = (fullHeight - bounds.height * scale) / 2 - bounds.y * scale + 50;
+                        
+                        console.log('Applying transform:', { scale, translateX, translateY });
+                        svg.call(zoom.transform, d3.zoomIdentity.translate(translateX, translateY).scale(scale));
+                    } else {
+                        // Fallback if bounds calculation fails
+                        console.warn('Invalid bounds, using fallback zoom');
+                        svg.call(zoom.transform, d3.zoomIdentity.translate(50, 50).scale(0.5));
+                    }
+                } catch (error) {
+                    console.error('Error setting zoom:', error);
+                    // Safe fallback
+                    svg.call(zoom.transform, d3.zoomIdentity.translate(50, 50).scale(0.5));
+                }
+            }, 100);
+            
+            // Store references for highlighting
+            window.nodeElements = nodeElements;
+            window.linkElements = linkElements;
+        }
+
+        // Handle course click with proper event handling to prevent shaking
+        function handleCourseClick(event, course) {
+            event.stopPropagation();
+            event.preventDefault();
+            
+            console.log(`Clicked on course: ${course}`);
+            
+            // Prevent multiple rapid clicks
+            if (this._clicking) return;
+            this._clicking = true;
+            setTimeout(() => {
+                this._clicking = false;
+            }, 200);
+            
+            selectedCourse = course;
+            showCourseDetails(course);
+            highlightCourse(course);
+        }
+
+        // Handle course hover
+        function handleCourseHover(event, course) {
+            // Add tooltip functionality here if desired
+        }
+
+        // Show course details in sidebar with error handling
+        function showCourseDetails(course) {
+            const courseData = courses[course];
+            if (!courseData) {
+                console.error(`Course data not found for: ${course}`);
+                return;
+            }
+            
+            const detailsContainer = d3.select("#courseDetails");
+            
+            try {
+                const concentrationTags = courseData.concentration.split(',').map(conc => {
+                    const concData = concentrations[conc.trim()];
+                    if (!concData) {
+                        console.warn(`Concentration not found: ${conc}`);
+                        return `<span class="concentration-tag" style="background-color: #808080">${conc}</span>`;
+                    }
+                    return `<span class="concentration-tag" style="background-color: ${concData.color}">${concData.name}</span>`;
+                }).join('');
+                
+                detailsContainer.html(`
+                    <div class="course-code">${course}</div>
+                    <div class="course-name">${courseData.name}</div>
+                    
+                    <div class="course-detail">
+                        <div class="course-detail-label">Level:</div>
+                        <div class="course-detail-value">${courseData.level === 'lower' ? 'Lower Division' : 'Upper Division'}</div>
+                    </div>
+                    
+                    <div class="course-detail">
+                        <div class="course-detail-label">Prerequisites:</div>
+                        <div class="course-detail-value">
+                            ${courseData.prerequisites.length > 0 ? 
+                                `<ul class="prerequisites-list">${courseData.prerequisites.map(prereq => `<li>${prereq}</li>`).join('')}</ul>` :
+                                'None'}
+                        </div>
+                    </div>
+                    
+                    <div class="course-detail">
+                        <div class="course-detail-label">Concentrations:</div>
+                        <div class="course-detail-value">
+                            <div class="concentrations-list">
+                                ${concentrationTags}
+                            </div>
+                        </div>
+                    </div>
+                `);
+            } catch (error) {
+                console.error('Error showing course details:', error);
+                detailsContainer.html(`
+                    <div class="course-code">${course}</div>
+                    <div class="course-name">${courseData.name}</div>
+                    <p style="color: var(--color-error);">Error loading course details</p>
+                `);
+            }
+        }
+
+        // Highlight course and its prerequisites/dependents
+        function highlightCourse(course) {
+            if (!window.nodeElements || !window.linkElements) return;
+            
+            // Get all prerequisites and dependents
+            const prerequisites = new Set(courses[course].prerequisites);
+            const dependents = new Set();
+            
+            Object.entries(courses).forEach(([c, data]) => {
+                if (data.prerequisites.includes(course)) {
+                    dependents.add(c);
+                }
+            });
+            
+            const relatedCourses = new Set([course, ...prerequisites, ...dependents]);
+            
+            // Highlight nodes
+            window.nodeElements
+                .classed("highlighted", d => d === course)
+                .classed("faded", d => !relatedCourses.has(d));
+            
+            // Highlight links
+            window.linkElements
+                .classed("highlighted", d => 
+                    (d.source === course || d.target === course) ||
+                    (prerequisites.has(d.source) && d.target === course) ||
+                    (d.source === course && dependents.has(d.target))
+                )
+                .classed("faded", d => 
+                    !(relatedCourses.has(d.source) && relatedCourses.has(d.target))
+                )
+                .attr("marker-end", d => 
+                    d.source === course || d.target === course || 
+                    (prerequisites.has(d.source) && d.target === course) ||
+                    (d.source === course && dependents.has(d.target)) ?
+                    "url(#arrowhead-highlight)" : "url(#arrowhead)"
+                );
+        }
+
+        // Clear highlighting
+        function clearHighlighting() {
+            if (!window.nodeElements || !window.linkElements) return;
+            
+            window.nodeElements
+                .classed("highlighted", false)
+                .classed("faded", false);
+            
+            window.linkElements
+                .classed("highlighted", false)
+                .classed("faded", false)
+                .attr("marker-end", "url(#arrowhead)");
+        }
+
+        // Handle search input
+        function handleSearch() {
+            searchTerm = document.getElementById('searchInput').value;
+            clearHighlighting();
+            drawCourseMap();
+        }
+
+        // Handle concentration filter
+        function handleConcentrationFilter() {
+            filteredConcentration = document.getElementById('concentrationFilter').value;
+            clearHighlighting();
+            drawCourseMap();
+        }
+
+        // Initialize the application with comprehensive error handling
+        function initialize() {
+            console.log('Initializing Berkeley Bioengineering Course Map...');
+            
+            try {
+                console.log('Creating legend...');
+                createLegend();
+                
+                console.log('Drawing course map...');
+                drawCourseMap();
+                
+                // Set up event listeners
+                const searchInput = document.getElementById('searchInput');
+                const concentrationFilter = document.getElementById('concentrationFilter');
+                
+                if (searchInput) {
+                    searchInput.addEventListener('input', handleSearch);
+                    console.log('Search input listener added');
+                }
+                
+                if (concentrationFilter) {
+                    concentrationFilter.addEventListener('change', handleConcentrationFilter);
+                    console.log('Concentration filter listener added');
+                }
+                
+                // Click outside to clear selection with better event handling
+                svg.on('click', function(event) {
+                    if (event.target === this || event.target.tagName === 'svg') {
+                        event.stopPropagation();
+                        selectedCourse = null;
+                        document.getElementById('courseDetails').innerHTML = 
+                            '<p style="color: var(--color-text-secondary); text-align: center; margin-top: 2rem;">Click on a course to see details</p>';
+                        clearHighlighting();
+                    }
+                });
+                
+                console.log('Application initialized successfully!');
+            } catch (error) {
+                console.error('Error initializing application:', error);
+                // Show error message to user
+                const errorMsg = document.createElement('div');
+                errorMsg.innerHTML = '<p style="color: red; text-align: center; padding: 20px;">Error loading course map. Please refresh the page.</p>';
+                document.body.appendChild(errorMsg);
+            }
+        }
+
+        // Start the application when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, starting application...');
+            initialize();
+        });
+        
+        // Also start immediately in case DOM is already loaded
+        if (document.readyState === 'loading') {
+            // DOM hasn't finished loading yet
+        } else {
+            // DOM is already loaded
+            console.log('DOM already loaded, starting application immediately...');
+            initialize();
+        }
+    </script>
+</body>
+</html>

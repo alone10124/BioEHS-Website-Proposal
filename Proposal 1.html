@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BioE Course Prerequisites Map</title>
+    <script src="https://unpkg.com/cytoscape@3.26.0/dist/cytoscape.min.js"></script>
+    <script src="https://unpkg.com/dagre@0.8.5/dist/dagre.min.js"></script>
+    <script src="https://unpkg.com/cytoscape-dagre@2.5.0/cytoscape-dagre.js"></script>
+    <style>
+        :root {
+  /* Primitive Color Tokens */
+  --color-white: rgba(255, 255, 255, 1);
+  --color-black: rgba(0, 0, 0, 1);
+  --color-cream-50: rgba(252, 252, 249, 1);
+  --color-cream-100: rgba(255, 255, 253, 1);
+  --color-gray-200: rgba(245, 245, 245, 1);
+  --color-gray-300: rgba(167, 169, 169, 1);
+  --color-gray-400: rgba(119, 124, 124, 1);
+  --color-slate-500: rgba(98, 108, 113, 1);
+  --color-brown-600: rgba(94, 82, 64, 1);
+  --color-charcoal-700: rgba(31, 33, 33, 1);
+  --color-charcoal-800: rgba(38, 40, 40, 1);
+  --color-slate-900: rgba(19, 52, 59, 1);
+  --color-teal-300: rgba(50, 184, 198, 1);
+  --color-teal-400: rgba(45, 166, 178, 1);
+  --color-teal-500: rgba(33, 128, 141, 1);
+  --color-teal-600: rgba(29, 116, 128, 1);
+  --color-teal-700: rgba(26, 104, 115, 1);
+  --color-teal-800: rgba(41, 150, 161, 1);
+  --color-red-400: rgba(255, 84, 89, 1);
+  --color-red-500: rgba(192, 21, 47, 1);
+  --color-orange-400: rgba(230, 129, 97, 1);
+  --color-orange-500: rgba(168, 75, 47, 1);
+
+  /* RGB versions for opacity control */
+  --color-brown-600-rgb: 94, 82, 64;
+  --color-teal-500-rgb: 33, 128, 141;
+  --color-slate-900-rgb: 19, 52, 59;
+  --color-slate-500-rgb: 98, 108, 113;
+  --color-red-500-rgb: 192, 21, 47;
+  --color-red-400-rgb: 255, 84, 89;
+  --color-orange-500-rgb: 168, 75, 47;
+  --color-orange-400-rgb: 230, 129, 97;
+
+  /* Background color tokens (Light Mode) */
+  --color-bg-1: rgba(59, 130, 246, 0.08); /* Light blue */
+  --color-bg-2: rgba(245, 158, 11, 0.08); /* Light yellow */
+  --color-bg-3: rgba(34, 197, 94, 0.08); /* Light green */
+  --color-bg-4: rgba(239, 68, 68, 0.08); /* Light red */
+  --color-bg-5: rgba(147, 51, 234, 0.08); /* Light purple */
+  --color-bg-6: rgba(249, 115, 22, 0.08); /* Light orange */
+  --color-bg-7: rgba(236, 72, 153, 0.08); /* Light pink */
+  --color-bg-8: rgba(6, 182, 212, 0.08); /* Light cyan */
+
+  /* Semantic Color Tokens (Light Mode) */
+  --color-background: var(--color-cream-50);
+  --color-surface: var(--color-cream-100);
+  --color-text: var(--color-slate-900);
+  --color-text-secondary: var(--color-slate-500);
+  --color-primary: var(--color-teal-500);
+  --color-primary-hover: var(--color-teal-600);
+  --color-primary-active: var(--color-teal-700);
+  --color-secondary: rgba(var(--color-brown-600-rgb), 0.12);
+  --color-secondary-hover: rgba(var(--color-brown-600-rgb), 0.2);
+  --color-secondary-active: rgba(var(--color-brown-600-rgb), 0.25);
+  --color-border: rgba(var(--color-brown-600-rgb), 0.2);
+  --color-btn-primary-text: var(--color-cream-50);
+  --color-card-border: rgba(var(--color-brown-600-rgb), 0.12);
+  --color-card-border-inner: rgba(var(--color-brown-600-rgb), 0.12);
+  --color-error: var(--color-red-500);
+  --color-success: var(--color-teal-500);
+  --color-warning: var(--color-orange-500);
+  --color-info: var(--color-slate-500);
+  --color-focus-ring: rgba(var(--color-teal-500-rgb), 0.4);
+  --color-select-caret: rgba(var(--color-slate-900-rgb), 0.8);
+
+  /* Common style patterns */
+  --focus-ring: 0 0 0 3px var(--color-focus-ring);
+  --focus-outline: 2px solid var(--color-primary);
+  --status-bg-opacity: 0.15;
+  --status-border-opacity: 0.25;
+  --select-caret-light: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23134252' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  --select-caret-dark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23f5f5f5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+
+  /* RGB versions for opacity control */
+  --color-success-rgb: 33, 128, 141;
+  --color-error-rgb: 192, 21, 47;
+  --color-warning-rgb: 168, 75, 47;
+  --color-info-rgb: 98, 108, 113;
+
+  /* Typography */
+  --font-family-base: "FKGroteskNeue", "Geist", "Inter", -apple-system,
+    BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-family-mono: "Berkeley Mono", ui-monospace, SFMono-Regular, Menlo,
+    Monaco, Consolas, monospace;
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-md: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 18px;
+  --font-size-2xl: 20px;
+  --font-size-3xl: 24px;
+  --font-size-4xl: 30px;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 550;
+  --font-weight-bold: 600;
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --letter-spacing-tight: -0.01em;
+
+  /* Spacing */
+  --space-0: 0;
+  --space-1: 1px;
+  --space-2: 2px;
+  --space-4: 4px;
+  --space-6: 6px;
+  --space-8: 8px;
+  --space-10: 10px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-20: 20px;
+  --space-24: 24px;
+  --space-32: 32px;
+
+  /* Border Radius */
+  --radius-sm: 6px;
+  --radius-base: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.02);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.04),
+    0 2px 4px -1px rgba(0, 0, 0, 0.02);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.04),
+    0 4px 6px -2px rgba(0, 0, 0, 0.02);
+  --shadow-inset-sm: inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.03);
+
+  /* Animation */
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --ease-standard: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Layout */
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1280px;
+}
+
+/* Dark mode colors */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* RGB versions for opacity control (Dark Mode) */
+    --color-gray-400-rgb: 119, 124, 124;
+    --color-teal-300-rgb: 50, 184, 198;
+    --color-gray-300-rgb: 167, 169, 169;
+    --color-gray-200-rgb: 245, 245, 245;
+
+    /* Background color tokens (Dark Mode) */
+    --color-bg-1: rgba(29, 78, 216, 0.15); /* Dark blue */
+    --color-bg-2: rgba(180, 83, 9, 0.15); /* Dark yellow */
+    --color-bg-3: rgba(21, 128, 61, 0.15); /* Dark green */
+    --color-bg-4: rgba(185, 28, 28, 0.15); /* Dark red */
+    --color-bg-5: rgba(107, 33, 168, 0.15); /* Dark purple */
+    --color-bg-6: rgba(194, 65, 12, 0.15); /* Dark orange */
+    --color-bg-7: rgba(190, 24, 93, 0.15); /* Dark pink */
+    --color-bg-8: rgba(8, 145, 178, 0.15); /* Dark cyan */
+
+    /* Semantic Color Tokens (Dark Mode) */
+    --color-background: var(--color-charcoal-700);
+    --color-surface: var(--color-charcoal-800);
+    --color-text: var(--color-gray-200);
+    --color-text-secondary: rgba(var(--color-gray-300-rgb), 0.7);
+    --color-primary: var(--color-teal-300);
+    --color-primary-hover: var(--color-teal-400);
+    --color-primary-active: var(--color-teal-800);
+    --color-secondary: rgba(var(--color-gray-400-rgb), 0.15);
+    --color-secondary-hover: rgba(var(--color-gray-400-rgb), 0.25);
+    --color-secondary-active: rgba(var(--color-gray-400-rgb), 0.3);
+    --color-border: rgba(var(--color-gray-400-rgb), 0.3);
+    --color-error: var(--color-red-400);
+    --color-success: var(--color-teal-300);
+    --color-warning: var(--color-orange-400);
+    --color-info: var(--color-gray-300);
+    --color-focus-ring: rgba(var(--color-teal-300-rgb), 0.4);
+    --color-btn-primary-text: var(--color-slate-900);
+    --color-card-border: rgba(var(--color-gray-400-rgb), 0.2);
+    --color-card-border-inner: rgba(var(--color-gray-400-rgb), 0.15);
+    --shadow-inset-sm: inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+    --button-border-secondary: rgba(var(--color-gray-400-rgb), 0.2);
+    --color-border-secondary: rgba(var(--color-gray-400-rgb), 0.2);
+    --color-select-caret: rgba(var(--color-gray-200-rgb), 0.8);
+
+    /* Common style patterns - updated for dark mode */
+    --focus-ring: 0 0 0 3px var(--color-focus-ring);
+    --focus-outline: 2px solid var(--color-primary);
+    --status-bg-opacity: 0.15;
+    --status-border-opacity: 0.25;
+    --select-caret-light: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23134252' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    --select-caret-dark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23f5f5f5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+
+    /* RGB versions for dark mode */
+    --color-success-rgb: var(--color-teal-300-rgb);
+    --color-error-rgb: var(--color-red-400-rgb);
+    --color-warning-rgb: var(--color-orange-400-rgb);
+    --color-info-rgb: var(--color-gray-300-rgb);
+  }
+}
+
+/* Base styles */
+html {
+  font-size: var(--font-size-base);
+  font-family: var(--font-family-base);
+  line-height: var(--line-height-normal);
+  color: var(--color-text);
+  background-color: var(--color-background);
+  -webkit-font-smoothing: antialiased;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+/* Typography */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+h1 {
+  font-size: var(--font-size-4xl);
+}
+h2 {
+  font-size: var(--font-size-3xl);
+}
+h3 {
+  font-size: var(--font-size-2xl);
+}
+h4 {
+  font-size: var(--font-size-xl);
+}
+h5 {
+  font-size: var(--font-size-lg);
+}
+h6 {
+  font-size: var(--font-size-md);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8) var(--space-16);
+  border-radius: var(--radius-base);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: all var(--duration-normal) var(--ease-standard);
+  border: none;
+  text-decoration: none;
+  position: relative;
+}
+
+.btn:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.btn--primary {
+  background: var(--color-primary);
+  color: var(--color-btn-primary-text);
+}
+
+.btn--primary:hover {
+  background: var(--color-primary-hover);
+}
+
+.btn--secondary {
+  background: var(--color-secondary);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.btn--secondary:hover {
+  background: var(--color-secondary-hover);
+}
+
+        /* Custom styles for the course map */
+        .app-container {
+            display: flex;
+            height: 100vh;
+            background-color: var(--color-background);
+        }
+
+        .sidebar {
+            width: 280px;
+            background-color: var(--color-surface);
+            border-right: 1px solid var(--color-card-border);
+            padding: var(--space-16);
+            overflow-y: auto;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .header {
+            background-color: var(--color-surface);
+            border-bottom: 1px solid var(--color-card-border);
+            padding: var(--space-16) var(--space-24);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .controls {
+            display: flex;
+            gap: var(--space-8);
+        }
+
+        .graph-container {
+            flex: 1;
+            position: relative;
+            background-color: var(--color-background);
+        }
+
+        #cy {
+            width: 100%;
+            height: 100%;
+        }
+
+        .legend {
+            margin-bottom: var(--space-24);
+        }
+
+        .legend h3 {
+            margin-bottom: var(--space-12);
+            font-size: var(--font-size-lg);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: var(--space-8);
+            font-size: var(--font-size-sm);
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: var(--radius-sm);
+            margin-right: var(--space-8);
+            border: 1px solid var(--color-border);
+        }
+
+        .info-panel {
+            background-color: var(--color-bg-1);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-16);
+            margin-bottom: var(--space-16);
+        }
+
+        .info-panel h4 {
+            margin-bottom: var(--space-8);
+        }
+
+        .info-panel p {
+            margin: 0;
+            font-size: var(--font-size-sm);
+            color: var(--color-text-secondary);
+        }
+
+        .tooltip {
+            position: absolute;
+            background-color: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-base);
+            padding: var(--space-8) var(--space-12);
+            font-size: var(--font-size-sm);
+            box-shadow: var(--shadow-md);
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity var(--duration-fast) var(--ease-standard);
+        }
+
+        .tooltip.visible {
+            opacity: 1;
+        }
+
+        .course-stats {
+            margin-top: var(--space-16);
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--space-4);
+            font-size: var(--font-size-sm);
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                max-height: 200px;
+                border-right: none;
+                border-bottom: 1px solid var(--color-card-border);
+            }
+
+            .header {
+                flex-direction: column;
+                gap: var(--space-8);
+                align-items: stretch;
+            }
+
+            .controls {
+                justify-content: center;
+            }
+        }
+
+        .concentration-filters {
+            margin-bottom: var(--space-24);
+        }
+        
+        .concentration-filters h3 {
+            margin-bottom: var(--space-12);
+            font-size: var(--font-size-lg);
+        }
+        
+        .concentration-filters label {
+            font-size: var(--font-size-sm);
+            color: var(--color-text);
+            cursor: pointer;
+        }
+        
+        .concentration-filters input[type="checkbox"] {
+            margin-right: var(--space-8);
+        }
+
+        .cluster-background {
+            transition: all 0.3s ease;
+        }
+
+        #cy {
+            position: relative;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="legend">
+                <h3>Concentrations &amp; Prerequisites</h3>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #E8E8E8;"></div>
+                    <span>Foundation (All)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #B3D9FF;"></div>
+                    <span>Math/Physics/Chemistry</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #B3FFB3;"></div>
+                    <span>Programming/EECS</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #FF8C42;"></div>
+                    <span>Devices</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #8E44AD;"></div>
+                    <span>Imaging</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #E91E63;"></div>
+                    <span>Cell &amp; Tissue Engineering</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #00ACC1;"></div>
+                    <span>Computational &amp; Synthetic Biology</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #FFC107;"></div>
+                    <span>Cross-listed</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #455A64;"></div>
+                    <span>Research/Design</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #FF8C42; background-image: url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2240%22 viewBox=%220 0 40 40%22%3E%3Cdefs%3E%3Cpattern id=%22p%22 width=%228%22 height=%228%22 patternUnits=%22userSpaceOnUse%22 patternTransform=%22rotate(45)%22%3E%3Crect width=%228%22 height=%228%22 fill=%22transparent%22/%3E%3Crect width=%224%22 height=%228%22 fill=%22%238E44AD%22/%3E%3C/pattern%3E%3C/defs%3E%3Crect width=%2240%22 height=%2240%22 fill=%22url(%23p)%22/%3E%3C/svg%3E'); background-size: cover;"></div>
+                    <span>Multiple concentrations (diagonal stripes)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #E8E8E8; border: 3px solid #9E9E9E;"></div>
+                    <span>Lab course (darker border)</span>
+                </div>
+            </div>
+            
+            <div class="concentration-filters">
+                <h3>Filter by Concentration</h3>
+                <label style="display: block; margin-bottom: 8px;"><input type="checkbox" id="filter-all" checked> All Courses</label>
+                <label style="display: block; margin-bottom: 8px;"><input type="checkbox" id="filter-devices" checked> Devices</label>
+                <label style="display: block; margin-bottom: 8px;"><input type="checkbox" id="filter-imaging" checked> Imaging</label>
+                <label style="display: block; margin-bottom: 8px;"><input type="checkbox" id="filter-celltissue" checked> Cell &amp; Tissue</label>
+                <label style="display: block; margin-bottom: 8px;"><input type="checkbox" id="filter-compsyn" checked> Comp &amp; Syn Biology</label>
+                <label style="display: block; margin-bottom: 8px;"><input type="checkbox" id="filter-prerequisites" checked> Prerequisites</label>
+            </div>
+
+            <div class="info-panel">
+                <h4>Instructions</h4>
+                <p>• Click on a course to highlight prerequisites and dependents</p>
+                <p>• Hover over courses for detailed information</p>
+                <p>• Use mouse wheel or controls to zoom</p>
+                <p>• Drag the background to pan around the map</p>
+            </div>
+
+            <div class="course-stats">
+                <h4>Course Statistics</h4>
+                <div class="stat-item">
+                    <span>Total Courses:</span>
+                    <span id="total-courses">24</span>
+                </div>
+                <div class="stat-item">
+                    <span>Prerequisites:</span>
+                    <span id="total-prereqs">24</span>
+                </div>
+                <div class="stat-item">
+                    <span>Selected:</span>
+                    <span id="selected-course">None</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="header">
+                <h1>BioE Course Prerequisites Map</h1>
+                <div class="controls">
+                    <button class="btn btn--secondary" id="fit-btn">Fit to Screen</button>
+                    <button class="btn btn--secondary" id="reset-btn">Reset Layout</button>
+                    <button class="btn btn--secondary" id="cluster-btn">Reset Layout</button>
+                    <button class="btn btn--primary" id="center-btn">Center</button>
+                </div>
+            </div>
+
+            <div class="graph-container">
+                <div id="cy"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tooltip" id="tooltip">
+        <div id="tooltip-content"></div>
+    </div>
+
+    <script>
+        // Course data with fixed positions for organized layout
+        const courses = [
+            // TOP SECTION - Lower Division Prerequisites (< 100)
+            // Math Prerequisites (Row 1)
+            { id: "Math1A", label: "Math 1A", title: "Calculus I", level: "lower", category: "math", concentrations: ["all"], units: 4, fixed_position: {x: 100, y: 50} },
+            { id: "Math1B", label: "Math 1B", title: "Calculus II", level: "lower", category: "math", concentrations: ["all"], units: 4, fixed_position: {x: 200, y: 50} },
+            { id: "Math53", label: "Math 53", title: "Multivariable Calculus", level: "lower", category: "math", concentrations: ["all"], units: 4, fixed_position: {x: 300, y: 50} },
+            { id: "Math54", label: "Math 54", title: "Linear Algebra", level: "lower", category: "math", concentrations: ["all"], units: 4, fixed_position: {x: 400, y: 50} },
+            { id: "Physics7A", label: "Physics 7A", title: "Physics for Scientists and Engineers", level: "lower", category: "physics", concentrations: ["all"], units: 4, fixed_position: {x: 500, y: 50} },
+            { id: "Physics7B", label: "Physics 7B", title: "Physics for Scientists and Engineers", level: "lower", category: "physics", concentrations: ["all"], units: 4, fixed_position: {x: 600, y: 50} },
+            { id: "Chem1A", label: "Chem 1A", title: "General Chemistry", level: "lower", category: "chemistry", concentrations: ["all"], units: 4, fixed_position: {x: 700, y: 50} },
+            { id: "Chem3A", label: "Chem 3A", title: "Chemical Structure and Reactivity", level: "lower", category: "chemistry", concentrations: ["all"], units: 4, fixed_position: {x: 800, y: 50} },
+            
+            // Programming & EECS Prerequisites (Row 2)
+            { id: "EECS16A", label: "EECS 16A", title: "Designing Information Devices and Systems I", level: "lower", category: "eecs", concentrations: ["devices", "imaging"], units: 4, fixed_position: {x: 100, y: 120} },
+            { id: "EECS16B", label: "EECS 16B", title: "Designing Information Devices and Systems II", level: "lower", category: "eecs", concentrations: ["devices", "imaging"], units: 4, fixed_position: {x: 200, y: 120} },
+            { id: "E7", label: "E7", title: "Introduction to Computer Programming", level: "lower", category: "programming", concentrations: ["devices", "imaging"], units: 4, fixed_position: {x: 300, y: 120} },
+            { id: "CS61A", label: "CS 61A", title: "Structure and Interpretation of Computer Programs", level: "lower", category: "programming", concentrations: ["compsyn"], units: 4, fixed_position: {x: 400, y: 120} },
+            { id: "CS61B", label: "CS 61B", title: "Data Structures", level: "lower", category: "programming", concentrations: ["compsyn"], units: 4, fixed_position: {x: 500, y: 120} },
+            { id: "CS70", label: "CS 70", title: "Discrete Mathematics and Probability Theory", level: "lower", category: "programming", concentrations: ["compsyn"], units: 4, fixed_position: {x: 600, y: 120} },
+            
+            // BioE Lower Division (Row 3)
+            { id: "BioE10", label: "BioE 10", title: "Introduction to Biomedicine for Engineers", level: "lower", category: "foundation", concentrations: ["all"], units: 4, fixed_position: {x: 100, y: 190} },
+            { id: "BioE11", label: "BioE 11", title: "Engineering Molecules 1", level: "lower", category: "foundation", concentrations: ["all"], units: 3, fixed_position: {x: 200, y: 190} },
+            { id: "BioE25", label: "BioE 25", title: "Careers in Biotechnology", level: "lower", category: "seminar", concentrations: ["all"], units: 1, fixed_position: {x: 300, y: 190} },
+            { id: "BioE26", label: "BioE 26", title: "Introduction to Bioengineering", level: "lower", category: "seminar", concentrations: ["all"], units: 1, fixed_position: {x: 400, y: 190} },
+
+            // BOTTOM SECTION - Upper Division Courses
+            
+            // Foundation/Core (center)
+            { id: "BioE100", label: "BioE 100", title: "Ethics in Science and Engineering", level: "upper", category: "core", concentrations: ["all"], units: 3, fixed_position: {x: 400, y: 300} },
+            { id: "BioE103", label: "BioE 103", title: "Engineering Molecules 2", level: "upper", category: "core", concentrations: ["devices", "celltissue", "compsyn"], units: 4, fixed_position: {x: 300, y: 350} },
+            { id: "BioE104", label: "BioE 104", title: "Biological Transport Phenomena", level: "upper", category: "core", concentrations: ["devices", "celltissue", "compsyn"], units: 4, fixed_position: {x: 500, y: 350} },
+            
+            // Devices (left side)
+            { id: "BioE101", label: "BioE 101", title: "Instrumentation in Biology and Medicine", level: "upper", category: "core", concentrations: ["devices", "imaging"], units: 4, fixed_position: {x: 100, y: 300} },
+            { id: "BioE105", label: "BioE 105", title: "Engineering Devices 1", level: "upper", category: "core", concentrations: ["devices"], units: 4, fixed_position: {x: 50, y: 350} },
+            { id: "BioE121", label: "BioE 121", title: "BioMEMS and Medical Devices", level: "upper", category: "elective", concentrations: ["devices"], units: 4, fixed_position: {x: 50, y: 400} },
+            { id: "BioE121L", label: "BioE 121L", title: "BioMEMS and BioNanotechnology Laboratory", level: "upper", category: "lab", concentrations: ["devices"], units: 4, fixed_position: {x: 150, y: 400} },
+            { id: "BioE148", label: "BioE 148", title: "Biomedical Devices", level: "upper", category: "elective", concentrations: ["devices"], units: 3, fixed_position: {x: 50, y: 450} },
+            { id: "BioE166", label: "BioE 166", title: "Neural Prostheses", level: "upper", category: "elective", concentrations: ["devices"], units: 4, fixed_position: {x: 150, y: 450} },
+            { id: "BioEC119", label: "BioE C119", title: "Introduction to MEMS", level: "upper", category: "crosslisted", concentrations: ["devices"], units: 4, fixed_position: {x: 100, y: 500} },
+            
+            // Imaging (right side)
+            { id: "BioE163", label: "BioE 163", title: "Biophotonics", level: "upper", category: "elective", concentrations: ["imaging"], units: 4, fixed_position: {x: 700, y: 300} },
+            { id: "BioE163L", label: "BioE 163L", title: "Molecular and Cellular Biophotonics Laboratory", level: "upper", category: "lab", concentrations: ["imaging"], units: 4, fixed_position: {x: 750, y: 350} },
+            { id: "BioEC165", label: "BioE C165", title: "Biomedical Imaging", level: "upper", category: "elective", concentrations: ["imaging"], units: 4, fixed_position: {x: 650, y: 350} },
+            { id: "BioE168L", label: "BioE 168L", title: "Practical Light Microscopy", level: "upper", category: "lab", concentrations: ["imaging"], units: 3, fixed_position: {x: 700, y: 400} },
+            { id: "BioEC149", label: "BioE C149", title: "Molecular Imaging", level: "upper", category: "elective", concentrations: ["imaging"], units: 4, fixed_position: {x: 650, y: 450} },
+            { id: "BioEC118", label: "BioE C118", title: "Optical Engineering", level: "upper", category: "crosslisted", concentrations: ["imaging"], units: 4, fixed_position: {x: 750, y: 450} },
+            { id: "BioE110", label: "BioE 110", title: "Biomedical Physiology for Engineers", level: "upper", category: "core", concentrations: ["devices", "imaging"], units: 4, fixed_position: {x: 700, y: 500} },
+            
+            // Cell & Tissue Engineering (bottom left)
+            { id: "BioE102", label: "BioE 102", title: "Biomechanics: Analysis and Design", level: "upper", category: "core", concentrations: ["celltissue"], units: 4, fixed_position: {x: 100, y: 600} },
+            { id: "BioE114", label: "BioE 114", title: "Cell Engineering", level: "upper", category: "core", concentrations: ["celltissue"], units: 4, fixed_position: {x: 200, y: 600} },
+            { id: "BioE115", label: "BioE 115", title: "Tissue Engineering Lab", level: "upper", category: "lab", concentrations: ["celltissue"], units: 4, fixed_position: {x: 150, y: 650} },
+            { id: "BioE124", label: "BioE 124", title: "Basic Principles of Drug Delivery", level: "upper", category: "elective", concentrations: ["celltissue"], units: 3, fixed_position: {x: 50, y: 650} },
+            { id: "BioE147", label: "BioE 147", title: "Principles of Synthetic Biology", level: "upper", category: "elective", concentrations: ["celltissue"], units: 4, fixed_position: {x: 250, y: 650} },
+            { id: "BioEC146", label: "BioE C146", title: "Physical Principles for Understanding Cells", level: "upper", category: "elective", concentrations: ["celltissue"], units: 4, fixed_position: {x: 100, y: 700} },
+            { id: "BioE111", label: "BioE 111", title: "Functional Biomaterials Development and Characterization", level: "upper", category: "lab", concentrations: ["celltissue", "compsyn"], units: 4, fixed_position: {x: 200, y: 700} },
+            
+            // Computational & Synthetic Biology (bottom right)
+            { id: "BioEC131", label: "BioE C131", title: "Introduction to Computational Molecular and Cell Biology", level: "upper", category: "elective", concentrations: ["compsyn"], units: 4, fixed_position: {x: 600, y: 600} },
+            { id: "BioE134", label: "BioE 134", title: "Biodesign Automation", level: "upper", category: "elective", concentrations: ["compsyn"], units: 4, fixed_position: {x: 700, y: 600} },
+            { id: "BioE135", label: "BioE 135", title: "Frontiers in Microbial Systems Biology", level: "upper", category: "elective", concentrations: ["compsyn"], units: 4, fixed_position: {x: 550, y: 650} },
+            { id: "BioE140L", label: "BioE 140L", title: "Synthetic Biology Laboratory", level: "upper", category: "lab", concentrations: ["compsyn"], units: 4, fixed_position: {x: 650, y: 650} },
+            { id: "BioE145", label: "BioE 145", title: "Introduction to Machine Learning for Computational Biology", level: "upper", category: "elective", concentrations: ["compsyn"], units: 4, fixed_position: {x: 750, y: 650} },
+            { id: "BioEC142", label: "BioE C142", title: "Computational Methods in Biology", level: "upper", category: "elective", concentrations: ["compsyn"], units: 4, fixed_position: {x: 600, y: 700} },
+            { id: "BioEC171", label: "BioE C171", title: "Systems Biology", level: "upper", category: "elective", concentrations: ["compsyn"], units: 4, fixed_position: {x: 700, y: 700} },
+            
+            // Additional shared courses
+            { id: "BioE192", label: "BioE 192", title: "Senior Design Projects", level: "upper", category: "design", concentrations: ["all"], units: 5, fixed_position: {x: 400, y: 750} },
+            { id: "BioE198", label: "BioE 198", title: "Directed Group Study for Advanced Undergraduates", level: "upper", category: "research", concentrations: ["all"], units: "1-4", fixed_position: {x: 500, y: 750} }
+        ];
+
+        const prerequisites = [
+            // Basic math/science sequence (only explicit relationships from catalog)
+            { source: "Math1A", target: "Math1B" },
+            { source: "Math1B", target: "Math53" },
+            { source: "Math1B", target: "Math54" },
+            { source: "Physics7A", target: "Physics7B" },
+            { source: "Chem1A", target: "Chem3A" },
+            { source: "EECS16A", target: "EECS16B" },
+            { source: "CS61A", target: "CS61B" },
+            { source: "CS61A", target: "CS70" },
+            { source: "Math1A", target: "CS70" },
+            
+            // Prerequisites for BioE courses (only what's explicitly stated in catalog)
+            { source: "Chem3A", target: "BioE11" },
+            
+            { source: "EECS16A", target: "BioE101" },
+            { source: "EECS16B", target: "BioE101" },
+            { source: "Math53", target: "BioE101" },
+            { source: "Math54", target: "BioE101" },
+            { source: "Physics7A", target: "BioE101" },
+            { source: "Physics7B", target: "BioE101" },
+            
+            { source: "Math53", target: "BioE102" },
+            { source: "Math54", target: "BioE102" },
+            { source: "Physics7A", target: "BioE102" },
+            
+            { source: "Physics7A", target: "BioE103" },
+            { source: "Physics7B", target: "BioE103" },
+            { source: "Math53", target: "BioE103" },
+            { source: "Math54", target: "BioE103" },
+            { source: "BioE11", target: "BioE103" },
+            
+            { source: "Math53", target: "BioE104" },
+            { source: "Math54", target: "BioE104" },
+            { source: "Physics7A", target: "BioE104" },
+            
+            { source: "Math53", target: "BioE105" },
+            { source: "Physics7A", target: "BioE105" },
+            { source: "Physics7B", target: "BioE105" },
+            
+            { source: "BioE10", target: "BioE110" },
+            { source: "Math54", target: "BioE110" },
+            
+            { source: "BioE11", target: "BioE111" },
+            { source: "BioE103", target: "BioE111" },
+            
+            { source: "BioE11", target: "BioE114" },
+            
+            { source: "BioE114", target: "BioE115" },
+            { source: "BioE11", target: "BioE115" },
+            
+            { source: "Physics7B", target: "BioEC118" },
+            { source: "Math53", target: "BioEC118" },
+            
+            { source: "Physics7A", target: "BioEC119" },
+            { source: "Math53", target: "BioEC119" },
+            
+            { source: "Chem3A", target: "BioE121" },
+            { source: "Physics7A", target: "BioE121" },
+            { source: "Physics7B", target: "BioE121" },
+            { source: "BioE104", target: "BioE121" },
+            
+            { source: "BioE104", target: "BioE121L" },
+            { source: "BioE121", target: "BioE121L" },
+            
+            { source: "BioE11", target: "BioE124" },
+            { source: "BioE103", target: "BioE124" },
+            { source: "BioE104", target: "BioE124" },
+            
+            { source: "BioE11", target: "BioEC131" },
+            { source: "E7", target: "BioEC131" },
+            { source: "CS61A", target: "BioEC131" },
+            
+            { source: "CS61A", target: "BioE134" },
+            { source: "E7", target: "BioE134" },
+            { source: "BioE11", target: "BioE134" },
+            
+            { source: "BioE11", target: "BioE140L" },
+            
+            { source: "BioE11", target: "BioE145" },
+            { source: "Math54", target: "BioE145" },
+            { source: "CS61B", target: "BioE145" },
+            
+            { source: "Math53", target: "BioE147" },
+            { source: "Math54", target: "BioE147" },
+            { source: "BioE103", target: "BioE147" },
+            
+            { source: "Physics7B", target: "BioE163" },
+            { source: "Math53", target: "BioE163" },
+            
+            { source: "BioE163", target: "BioE163L" },
+            
+            { source: "Math53", target: "BioEC165" },
+            { source: "Physics7B", target: "BioEC165" }
+        ];
+
+        // Concentration color mappings based on UC Berkeley specifications
+        const concentrationColors = {
+            all: '#E8E8E8',           // Foundation courses (light gray)
+            math: '#B3D9FF',          // Math prerequisites (light blue)
+            physics: '#B3D9FF',       // Physics prerequisites (light blue)
+            chemistry: '#B3D9FF',     // Chemistry prerequisites (light blue)
+            programming: '#B3FFB3',   // Programming/EECS prerequisites (light green)
+            eecs: '#B3FFB3',          // EECS prerequisites (light green)
+            devices: '#FF8C42',       // Devices concentration (orange)
+            imaging: '#8E44AD',       // Imaging concentration (purple)
+            celltissue: '#E91E63',    // Cell & Tissue Engineering (pink)
+            compsyn: '#00ACC1',       // Computational & Synthetic Biology (teal)
+            crosslisted: '#FFC107',   // Cross-listed courses (yellow)
+            research: '#455A64',      // Research/Design courses (dark gray)
+            design: '#455A64'         // Design courses (dark gray)
+        };
+        
+        // Color mapping function
+        function getNodeColor(course) {
+            // Handle prerequisite courses by category
+            if (course.category === 'math' || course.category === 'physics' || course.category === 'chemistry') {
+                return concentrationColors[course.category];
+            }
+            if (course.category === 'programming' || course.category === 'eecs') {
+                return concentrationColors[course.category];
+            }
+            if (course.category === 'crosslisted') {
+                return concentrationColors.crosslisted;
+            }
+            if (course.category === 'research' || course.category === 'design') {
+                return concentrationColors.research;
+            }
+            
+            // Handle BioE courses by concentration
+            if (course.concentrations) {
+                if (course.concentrations.includes('all')) {
+                    return concentrationColors.all;
+                }
+                
+                // For courses with multiple concentrations, use gradient/mixed colors
+                if (course.concentrations.length > 1) {
+                    // Primary concentration determines color
+                    const primaryConc = course.concentrations[0];
+                    return concentrationColors[primaryConc] || concentrationColors.all;
+                }
+                
+                // Single concentration
+                const conc = course.concentrations[0];
+                return concentrationColors[conc] || concentrationColors.all;
+            }
+            
+            return concentrationColors.all;
+        }
+        
+        // Utility: darken a hex color
+        function darkenHexColor(baseColor, factor = 0.7){
+            const r = parseInt(baseColor.slice(1, 3), 16);
+            const g = parseInt(baseColor.slice(3, 5), 16);
+            const b = parseInt(baseColor.slice(5, 7), 16);
+            const newR = Math.round(r * factor);
+            const newG = Math.round(g * factor);
+            const newB = Math.round(b * factor);
+            return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
+        }
+        
+        function getFinalNodeColor(course) {
+            // Base color derives from category/concentrations; do not darken for labs (border will indicate lab)
+            return getNodeColor(course);
+        }
+
+        function getBorderColor(course) {
+            const base = getNodeColor(course);
+            return course.category === 'lab' ? darkenHexColor(base, 0.6) : base;
+        }
+        
+        // Stripe background for multi-concentration courses
+        function getStripeImage(course){
+            if (!course || course.category === 'crosslisted') return 'none';
+            const concs = course.concentrations || [];
+            if (concs.length <= 1) return 'none';
+            const colors = concs.map(c => concentrationColors[c]).filter(Boolean);
+            if (!colors.length) return 'none';
+            // Build SVG stripes alternating through provided colors
+            const stripeWidth = 6;
+            const totalWidth = stripeWidth * colors.length;
+            const rects = colors.map((c, i) => `<rect width='${stripeWidth}' height='40' x='${i*stripeWidth}' y='0' fill='${c}'/>`).join('');
+            const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${totalWidth}' height='40' viewBox='0 0 ${totalWidth} 40'><defs><pattern id='p' width='${totalWidth}' height='40' patternUnits='userSpaceOnUse' patternTransform='rotate(45)'>${rects}</pattern></defs><rect width='400' height='200' fill='url(#p)'/></svg>`;
+            const encoded = encodeURIComponent(svg);
+            return `url("data:image/svg+xml,${encoded}")`;
+        }
+
+        // Initialize Cytoscape with fixed positions
+        let cy = cytoscape({
+            container: document.getElementById('cy'),
+            
+            elements: [
+                // Nodes with fixed positions
+                ...courses.map(course => ({
+                    data: {
+                        id: course.id,
+                        label: course.label,
+                        displayLabel: `${course.label}\n${course.title}`,
+                        title: course.title,
+                        level: course.level,
+                        category: course.category,
+                        concentrations: course.concentrations || [],
+                        units: course.units,
+                        prereqText: course.prerequisites_text || '',
+                        type: 'course'
+                    },
+                    position: course.fixed_position || { x: 400, y: 400 }
+                })),
+                // Edges
+                ...prerequisites.map((prereq, index) => ({
+                    data: {
+                        id: `edge-${index}`,
+                        source: prereq.source,
+                        target: prereq.target,
+                        type: 'prerequisite'
+                    }
+                }))
+            ],
+
+            style: [
+                {
+                    selector: 'node',
+                    style: {
+                        'background-color': function(ele) {
+                            return getFinalNodeColor(ele.data());
+                        },
+                        'background-image': function(ele){
+                            return getStripeImage(ele.data());
+                        },
+                        'background-fit': 'cover',
+                        'background-image-opacity': function(ele){
+                            return (ele.data('category') !== 'crosslisted' && ele.data('concentrations') && ele.data('concentrations').length > 1) ? 0.85 : 0;
+                        },
+                        'border-color': function(ele) {
+                            return getBorderColor(ele.data());
+                        },
+                        'border-width': function(ele){
+                            return ele.data('category') === 'lab' ? 4 : 2;
+                        },
+                        'color': '#13343B',
+                        'label': 'data(displayLabel)',
+                        'text-valign': 'center',
+                        'text-halign': 'center',
+                        'font-size': 10,
+                        'font-weight': 'bold',
+                        'width': 120,
+                        'height': 50,
+                        'shape': 'rectangle',
+                        'text-wrap': 'wrap',
+                        'text-max-width': 110
+                    }
+                },
+                {
+                    selector: 'edge',
+                    style: {
+                        'width': 2,
+                        'line-color': '#666',
+                        'target-arrow-color': '#666',
+                        'target-arrow-shape': 'triangle',
+                        'curve-style': 'bezier',
+                        'arrow-scale': 1.2
+                    }
+                },
+                {
+                    selector: 'node:selected',
+                    style: {
+                        'border-width': 4,
+                        'border-color': '#ff6b35',
+                        'background-color': function(ele) {
+                            const baseColor = getNodeColor(ele.data());
+                            return baseColor;
+                        }
+                    }
+                },
+                {
+                    selector: '.highlighted',
+                    style: {
+                        'background-color': '#ff6b35',
+                        'line-color': '#ff6b35',
+                        'target-arrow-color': '#ff6b35',
+                        'border-color': '#ff6b35',
+                        'border-width': 3
+                    }
+                },
+                {
+                    selector: '.faded',
+                    style: {
+                        'opacity': 0.3
+                    }
+                }
+            ],
+
+            layout: {
+                name: 'preset'
+            },
+
+            wheelSensitivity: 0.2,
+            minZoom: 0.3,
+            maxZoom: 3.0,
+            
+            // Disable node dragging completely
+            autoungrabify: true,
+            userZoomingEnabled: true,
+            userPanningEnabled: true,
+            boxSelectionEnabled: false
+        });
+
+        // Tooltip functionality
+        const tooltip = document.getElementById('tooltip');
+        const tooltipContent = document.getElementById('tooltip-content');
+
+        function escapeHtml(str){
+            if (typeof str !== 'string') return str;
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+        const prettyConc = {
+            all: 'All Concentrations',
+            devices: 'Devices',
+            imaging: 'Imaging',
+            celltissue: 'Cell &amp; Tissue Engineering',
+            compsyn: 'Computational &amp; Synthetic Biology'
+        };
+        
+        cy.on('mouseover', 'node', function(event) {
+            const node = event.target;
+            const data = node.data();
+            const concs = Array.isArray(data.concentrations) ? data.concentrations : [];
+            const concentrationsText = concs.length ? concs.map(c => prettyConc[c] || c).join(', ') : 'N/A';
+            const bb = cy.container().getBoundingClientRect();
+            const x = bb.left + window.scrollX + event.renderedPosition.x + 12;
+            const y = bb.top + window.scrollY + event.renderedPosition.y + 12;
+            
+            tooltipContent.innerHTML = `
+                <strong>${escapeHtml(data.label)}</strong><br>
+                ${escapeHtml(data.title)}<br>
+                <small>Units: ${escapeHtml(String(data.units || 'N/A'))}</small><br>
+                <small>Concentrations: ${concentrationsText}</small><br>
+                <small>Catalog prereqs: ${escapeHtml(data.prereqText || 'See catalog')}</small>
+            `;
+            
+            tooltip.style.left = x + 'px';
+            tooltip.style.top = y + 'px';
+            tooltip.classList.add('visible');
+        });
+
+        cy.on('mouseout', 'node', function() {
+            tooltip.classList.remove('visible');
+        });
+
+        // Click functionality for highlighting
+        let selectedNode = null;
+
+        cy.on('tap', 'node', function(event) {
+            const node = event.target;
+            
+            // Clear previous highlights
+            cy.elements().removeClass('highlighted faded');
+            
+            if (selectedNode === node) {
+                // Deselect if clicking the same node
+                selectedNode = null;
+                document.getElementById('selected-course').textContent = 'None';
+                return;
+            }
+            
+            selectedNode = node;
+            document.getElementById('selected-course').textContent = node.data('label');
+            
+            // Compute full prerequisite and dependent chains
+            const up = node.predecessors();
+            const down = node.successors();
+            const related = up.union(down).union(node);
+            
+            // Fade all elements first
+            cy.elements().addClass('faded');
+            
+            // Highlight the selected node and related elements
+            related.removeClass('faded').addClass('highlighted');
+        });
+
+        // Click on background to deselect
+        cy.on('tap', function(event) {
+            if (event.target === cy) {
+                cy.elements().removeClass('highlighted faded');
+                selectedNode = null;
+                document.getElementById('selected-course').textContent = 'None';
+            }
+        });
+
+        // Control buttons
+        document.getElementById('fit-btn').addEventListener('click', function() {
+            cy.fit();
+        });
+
+        document.getElementById('reset-btn').addEventListener('click', function() {
+            cy.elements().removeClass('highlighted faded');
+            selectedNode = null;
+            document.getElementById('selected-course').textContent = 'None';
+            resetToFixedLayout();
+        });
+
+        document.getElementById('center-btn').addEventListener('click', function() {
+            cy.center();
+        });
+
+        document.getElementById('cluster-btn').addEventListener('click', function() {
+            resetToFixedLayout();
+        });
+
+        // Fixed layout function - positions nodes using their fixed_position data
+        function resetToFixedLayout() {
+            courses.forEach(course => {
+                const node = cy.getElementById(course.id);
+                if (node.length > 0 && course.fixed_position) {
+                    node.position(course.fixed_position);
+                }
+            });
+            
+            // Fit to screen with some padding
+            setTimeout(() => {
+                cy.fit(null, 50);
+            }, 100);
+        }
+
+        // Initialize with fixed layout
+        cy.ready(function() {
+            resetToFixedLayout();
+        });
+
+        // Concentration filtering functionality
+        const filterCheckboxes = {
+            all: document.getElementById('filter-all'),
+            devices: document.getElementById('filter-devices'),
+            imaging: document.getElementById('filter-imaging'),
+            celltissue: document.getElementById('filter-celltissue'),
+            compsyn: document.getElementById('filter-compsyn'),
+            prerequisites: document.getElementById('filter-prerequisites')
+        };
+        
+        function updateVisibility() {
+            const activeFilters = [];
+            
+            // Check which concentration filters are active
+            Object.keys(filterCheckboxes).forEach(key => {
+                if (filterCheckboxes[key] && filterCheckboxes[key].checked) {
+                    activeFilters.push(key);
+                }
+            });
+            
+            // Show/hide nodes based on filters
+            cy.nodes().forEach(node => {
+                const data = node.data();
+                let shouldShow = false;
+                
+                // Check if node matches any active filter
+                if (activeFilters.includes('all') && data.concentrations && data.concentrations.includes('all')) {
+                    shouldShow = true;
+                }
+                
+                if (activeFilters.includes('prerequisites') && 
+                    (data.category === 'math' || data.category === 'physics' || data.category === 'chemistry' || 
+                     data.category === 'programming' || data.category === 'eecs')) {
+                    shouldShow = true;
+                }
+                
+                if (data.concentrations) {
+                    data.concentrations.forEach(conc => {
+                        if (activeFilters.includes(conc)) {
+                            shouldShow = true;
+                        }
+                    });
+                }
+                
+                // Always show research/design courses and core courses
+                if (data.category === 'research' || data.category === 'design' || data.category === 'core' || data.category === 'foundation') {
+                    shouldShow = true;
+                }
+                
+                if (shouldShow) {
+                    node.style('display', 'element');
+                } else {
+                    node.style('display', 'none');
+                }
+            });
+            
+            // Update edge visibility based on node visibility
+            cy.edges().forEach(edge => {
+                const source = edge.source();
+                const target = edge.target();
+                
+                if (source.style('display') === 'element' && target.style('display') === 'element') {
+                    edge.style('display', 'element');
+                } else {
+                    edge.style('display', 'none');
+                }
+            });
+        }
+        
+        // Add event listeners to checkboxes
+        Object.values(filterCheckboxes).forEach(checkbox => {
+            if (checkbox) {
+                checkbox.addEventListener('change', updateVisibility);
+            }
+        });
+        
+        // Update statistics
+        document.getElementById('total-courses').textContent = courses.length;
+        document.getElementById('total-prereqs').textContent = prerequisites.length;
+        
+        // Add cluster background regions
+        function addClusterBackgrounds() {
+            // This is a simplified version - just add visual clustering through node styling
+            // rather than DOM overlays which can be complex with Cytoscape coordinates
+            
+            // Apply cluster-based background styling to nodes
+            const clusterGroups = {
+                foundation: cy.nodes().filter(n => n.data('category') === 'foundation' || n.data('category') === 'seminar'),
+                prerequisites: cy.nodes().filter(n => ['math', 'physics', 'chemistry', 'programming', 'eecs'].includes(n.data('category'))),
+                devices: cy.nodes().filter(n => n.data('concentrations') && n.data('concentrations').includes('devices') && !['math', 'physics', 'chemistry', 'programming', 'eecs', 'foundation', 'seminar'].includes(n.data('category'))),
+                imaging: cy.nodes().filter(n => n.data('concentrations') && n.data('concentrations').includes('imaging') && !['math', 'physics', 'chemistry', 'programming', 'eecs', 'foundation', 'seminar'].includes(n.data('category'))),
+                celltissue: cy.nodes().filter(n => n.data('concentrations') && n.data('concentrations').includes('celltissue') && !['math', 'physics', 'chemistry', 'programming', 'eecs', 'foundation', 'seminar'].includes(n.data('category'))),
+                compsyn: cy.nodes().filter(n => n.data('concentrations') && n.data('concentrations').includes('compsyn') && !['math', 'physics', 'chemistry', 'programming', 'eecs', 'foundation', 'seminar'].includes(n.data('category')))
+            };
+            
+            // Add subtle glow effects to indicate clustering
+            Object.entries(clusterGroups).forEach(([cluster, nodes]) => {
+                nodes.style({
+                    'box-shadow': '0 0 10px rgba(0,0,0,0.1)'
+                });
+            });
+        }
+        
+        // Update cluster backgrounds when layout changes
+        cy.on('layoutstop', function() {
+            setTimeout(addClusterBackgrounds, 100);
+        });
+    </script>
+</body>
+</html>
